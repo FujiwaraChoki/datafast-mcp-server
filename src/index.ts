@@ -2,6 +2,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { fetch } from "undici";
 import { z } from "zod";
 
 const DATAFAST_API_BASE = "https://datafa.st/api/v1";
