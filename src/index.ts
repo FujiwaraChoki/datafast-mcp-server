@@ -6,6 +6,15 @@ import { z } from "zod";
 
 const DATAFAST_API_BASE = "https://datafa.st/api/v1";
 
+// Get API key from command line arguments
+const API_KEY = process.argv[2];
+
+if (!API_KEY) {
+  console.error("Usage: datafast-mcp-server <API_KEY>");
+  console.error("Please provide your Datafast API key as an argument.");
+  process.exit(1);
+}
+
 // Create server instance
 const server = new McpServer({
   name: "datafast",
@@ -15,7 +24,6 @@ const server = new McpServer({
 // Helper function for making Datafast API requests
 async function makeDatafastRequest<T>(
   endpoint: string,
-  apiKey: string,
   params?: Record<string, string | number | undefined>
 ): Promise<T> {
   const url = new URL(`${DATAFAST_API_BASE}${endpoint}`);
@@ -31,7 +39,7 @@ async function makeDatafastRequest<T>(
   const response = await fetch(url.toString(), {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${API_KEY}`,
       Accept: "application/json",
     },
   });
@@ -107,7 +115,6 @@ server.registerTool(
     description:
       "Get aggregate analytics metrics for your website including visitors, sessions, bounce rate, revenue, and conversion rate",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -117,8 +124,8 @@ server.registerTool(
       ...dateParams,
     },
   },
-  async ({ apiKey, fields, startAt, endAt, timezone }) => {
-    const data = await makeDatafastRequest("/analytics/overview", apiKey, {
+  async ({ fields, startAt, endAt, timezone }) => {
+    const data = await makeDatafastRequest("/analytics/overview", {
       fields,
       startAt,
       endAt,
@@ -142,12 +149,10 @@ server.registerTool(
   {
     description:
       "Get the count of active visitors on your website in real-time (visitors with activity in the last 5 minutes)",
-    inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
-    },
+    inputSchema: {},
   },
-  async ({ apiKey }) => {
-    const data = await makeDatafastRequest("/analytics/realtime", apiKey);
+  async () => {
+    const data = await makeDatafastRequest("/analytics/realtime");
 
     return {
       content: [
@@ -167,7 +172,6 @@ server.registerTool(
     description:
       "Get analytics data broken down by page with hostname and path information",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -179,17 +183,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/pages", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/pages", {
       fields,
       startAt,
       endAt,
@@ -216,7 +211,6 @@ server.registerTool(
   {
     description: "Get analytics data segmented by referrer source",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -226,17 +220,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/referrers", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/referrers", {
       fields,
       startAt,
       endAt,
@@ -263,7 +248,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by country",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -275,17 +259,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/countries", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/countries", {
       fields,
       startAt,
       endAt,
@@ -313,7 +288,6 @@ server.registerTool(
     description:
       "Get analytics data segmented by device type (desktop, mobile, tablet)",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -323,17 +297,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/devices", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/devices", {
       fields,
       startAt,
       endAt,
@@ -360,7 +325,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by browser",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -370,17 +334,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/browsers", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/browsers", {
       fields,
       startAt,
       endAt,
@@ -407,7 +362,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by operating system",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -417,17 +371,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/os", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/os", {
       fields,
       startAt,
       endAt,
@@ -454,7 +399,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by custom goals",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -466,17 +410,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/goals", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/goals", {
       fields,
       startAt,
       endAt,
@@ -503,7 +438,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by region/state",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -513,17 +447,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/regions", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/regions", {
       fields,
       startAt,
       endAt,
@@ -550,7 +475,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by city",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -560,17 +484,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/cities", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/cities", {
       fields,
       startAt,
       endAt,
@@ -597,7 +512,6 @@ server.registerTool(
   {
     description: "Get analytics data broken down by UTM campaigns",
     inputSchema: {
-      apiKey: z.string().describe("Your Datafast API key"),
       fields: z
         .string()
         .optional()
@@ -609,17 +523,8 @@ server.registerTool(
       ...filterParams,
     },
   },
-  async ({
-    apiKey,
-    fields,
-    startAt,
-    endAt,
-    timezone,
-    limit,
-    offset,
-    ...filters
-  }) => {
-    const data = await makeDatafastRequest("/analytics/campaigns", apiKey, {
+  async ({ fields, startAt, endAt, timezone, limit, offset, ...filters }) => {
+    const data = await makeDatafastRequest("/analytics/campaigns", {
       fields,
       startAt,
       endAt,

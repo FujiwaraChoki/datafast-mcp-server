@@ -17,12 +17,14 @@ Add the server to your Claude Desktop configuration (`~/Library/Application Supp
 {
   "mcpServers": {
     "datafast": {
-      "command": "node",
-      "args": ["/path/to/datafast-mcp-server/build/index.js"]
+      "command": "bunx",
+      "args": ["datafast-mcp-server", "YOUR_DATAFAST_API_KEY"]
     }
   }
 }
 ```
+
+Replace `YOUR_DATAFAST_API_KEY` with your actual API key from **Website Settings > API** in your Datafast dashboard.
 
 ## Available Tools
 
@@ -44,8 +46,6 @@ Add the server to your Claude Desktop configuration (`~/Library/Application Supp
 | `get_campaigns` | Get analytics by UTM campaigns |
 
 ### Common Parameters
-
-All tools require an `apiKey` parameter. Get your API key from **Website Settings > API** in your Datafast dashboard.
 
 #### Date Range Parameters
 - `startAt`: Start date in ISO 8601 format (e.g., `2024-01-01`)
