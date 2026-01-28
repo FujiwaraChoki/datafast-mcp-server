@@ -1,0 +1,44 @@
+{
+  "name": "datafast-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Datafast analytics API",
+  "type": "module",
+  "bin": {
+    "datafast-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "start": "node build/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FujiwaraChoki/datafast-mcp-server.git"
+  },
+  "homepage": "https://github.com/FujiwaraChoki/datafast-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/FujiwaraChoki/datafast-mcp-server/issues"
+  },
+  "author": "FujiwaraChoki",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "datafast",
+    "analytics",
+    "claude",
+    "ai"
+  ],
+  "license": "MIT"
+}
